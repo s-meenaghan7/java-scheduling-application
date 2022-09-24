@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane id="AnchorPane" prefHeight="435.0" prefWidth="756.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.CustomerSchedulingController">
+    <children>
+        <Label alignment="CENTER" layoutX="176.0" layoutY="25.0" prefHeight="26.0" prefWidth="413.0" text="Customer Scheduling Report">
+            <font>
+                <Font name="System Bold" size="17.0" />
+            </font>
+        </Label>
+        <Separator layoutX="24.0" layoutY="54.0" prefHeight="34.0" prefWidth="705.0" />
+        <Label layoutX="183.0" layoutY="94.0" text="Select a customer from the drop down list below to view their appointments">
+            <font>
+                <Font name="System Italic" size="12.0" />
+            </font>
+        </Label>
+        <ComboBox fx:id="customerField" layoutX="303.0" layoutY="131.0" onAction="#customerFieldChanged" prefWidth="150.0" promptText="Customers" />
+        <TableView fx:id="appointmentsTableView" layoutX="26.0" layoutY="177.0" prefHeight="200.0" prefWidth="705.0">
+            <columns>
+                <TableColumn fx:id="appointmentIdCol" prefWidth="83.20001411437988" text="Appt. ID" />
+                <TableColumn fx:id="appointmentTitleCol" prefWidth="162.39998626708984" text="Title" />
+                <TableColumn fx:id="appointmentContactCol" prefWidth="146.4000244140625" text="Contact" />
+                <TableColumn fx:id="appointmentStartCol" prefWidth="168.00003051757812" text="Start" />
+                <TableColumn fx:id="appointmentEndCol" prefWidth="142.39996337890625" text="End" />
+            </columns>
+        </TableView>
+        <Button layoutX="628.0" layoutY="390.0" mnemonicParsing="false" onAction="#backButtonHandler" prefHeight="26.0" prefWidth="68.0" text="Go Back" />
+    </children>
+</AnchorPane>

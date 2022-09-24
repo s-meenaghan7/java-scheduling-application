@@ -13,7 +13,6 @@ import utils.SceneChanger;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
-import java.util.Locale;
 import java.util.ResourceBundle;
 import java.net.URL;
 import java.sql.SQLException;
@@ -35,9 +34,9 @@ import javafx.scene.control.PasswordField;
  FXML Login Screen Controller class
  @author Sean
  */
-public class LoginScreenController implements Initializable {
+public class LoginController implements Initializable {
 
-    private boolean loggedOn = false;
+    private boolean userNotFound = false; // todo: this needs to change or go away once submitButtonHandler has been refactored
     @FXML private Label loginLabel;
     @FXML private TextField userField;
     @FXML private PasswordField passField;
@@ -90,8 +89,8 @@ public class LoginScreenController implements Initializable {
         DBUsers.getAllUsers().forEach(user -> {
             if (inputUsername.equals(user.getUsername()) && inputPassword.equals(user.getPassword())) {
                 try {
-                    loggedOn = true;
-                    appendUserLog(loggedOn);
+                    userNotFound = true;
+                    appendUserLog(userNotFound);
                     User.user = user;
                     checkForAppointment();
                     SceneChanger.changeSceneTo(event, "MainScreen.fxml");
@@ -100,10 +99,11 @@ public class LoginScreenController implements Initializable {
                 }
             }
         });
-        if (loggedOn) return;
+
+        if (userNotFound) return;
 
         // only executes if inputUsername and inputPassword do not have a match in the allUsers list.
-        try { appendUserLog(loggedOn); } catch (IOException ee) { ee.printStackTrace(); } // record unsuccessful log in attempt
+        try { appendUserLog(userNotFound); } catch (IOException ee) { ee.printStackTrace(); } // record unsuccessful log in attempt
         errorLabel.setText("Error");
     }
 

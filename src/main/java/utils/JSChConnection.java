@@ -8,7 +8,7 @@ import java.util.logging.Level;
 /**
  * This class establishes a connection to an AWS EC2 instance via SSH, allowing the program to access a private RDS database instance on the same VPC as the EC2.
  */
-public class SSHConnection {
+public class JSChConnection {
 
     private static Session session = null;
     public static int assignedPort; // will be assigned via setPortForwarding()
@@ -54,7 +54,7 @@ public class SSHConnection {
             System.out.println("Port forwarding enabled: " + assignedPort);
 
         } catch (JSchException ex) {
-            java.util.logging.Logger.getLogger(SSHConnection.class.getName()).log(Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(JSChConnection.class.getName()).log(Level.SEVERE, null, ex);
         }
         System.out.println("SSH session established.");
     }

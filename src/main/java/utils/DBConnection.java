@@ -55,7 +55,7 @@ public class DBConnection {
         System.out.println("Attempting connection with remote database...");
         // JSCH_JDBC_URL created inside method call because the SSHConnection.assignedPort variable must be created first;
         // therefore, JDBC_URL cannot be static and initialized at runtime
-        final String JSCH_JDBC_URL = PROTOCOL + VENDOR + HOST + SSHConnection.assignedPort + "/" + DATABASE + "?autoReconnect=true";
+        final String JSCH_JDBC_URL = PROTOCOL + VENDOR + HOST + JSChConnection.assignedPort + "/" + DATABASE + "?autoReconnect=true";
 
         try {
             Class.forName(MYSQL_JDBC_DRIVER);
@@ -64,7 +64,7 @@ public class DBConnection {
         } catch (ClassNotFoundException | SQLException e) {
             System.out.println("Connection failed.");
             e.printStackTrace();
-            SSHConnection.disconnectSession();
+            JSChConnection.disconnectSession();
         }
 
         return conn;
