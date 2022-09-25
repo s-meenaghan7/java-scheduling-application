@@ -4,12 +4,18 @@
 INSERT INTO contacts (Contact_Name, Email, Type)
 VALUES ("", "", "");
 
+INSERT INTO contacts (Contact_Name, Email, Type)
+VALUES ("", "", "");
+
+INSERT INTO contacts (Contact_Name, Email, Type)
+VALUES ("", "", "");
+
 # Finance Contacts
 INSERT INTO contacts (Contact_Name, Email, Type)
-VALUES ("", "", "true");
+VALUES ("", "", "");
 
 INSERT INTO contacts (Contact_Name, Email, Type)
-VALUES ("", "", "false");
+VALUES ("", "", "");
 
 INSERT INTO contacts (Contact_Name, Email, Type)
-VALUES ("", "", "false");
+VALUES ("", "", "");
