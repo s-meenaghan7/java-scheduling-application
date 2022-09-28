@@ -66,7 +66,7 @@ public class DBCustomers {
 
             FirstLevelDivision division = DBDivisions.getAllDivisions().stream().filter(d -> d.getDivision().equals(divisionName)).findAny().orElseThrow();
 
-            // create a new Customer object, using the above variables to define it's fields and determine subclass
+            // create a new Customer object, using the above variables to define its fields and determine subclass
             Customer customer;
             boolean includesCrypto;
 
@@ -81,7 +81,6 @@ public class DBCustomers {
 
             allCustomers.add(customer);
         }
-
     }
 
     /**
@@ -118,7 +117,7 @@ public class DBCustomers {
         String lowerCaseName = customerName.toLowerCase();
 
         allCustomers.stream().filter(c -> (c.getName().toLowerCase().contains(lowerCaseName)))
-                .forEachOrdered(c -> customers.add(c));
+                .forEachOrdered(customers::add);
 
         return customers;
     }
@@ -167,7 +166,7 @@ public class DBCustomers {
                 + "'" + newCustomer.getAddress() + "', "
                 + "'" + newCustomer.getZipCode() + "', "
                 + "'" + newCustomer.getPhoneNum() + "', "
-                + "'" + String.valueOf(newCustomer.includesCrypto()) + "', "
+                + "'" + newCustomer.includesCrypto() + "', "
                 + "'" + User.user.getUsername() + "', "
                 + "'" + User.user.getUsername() + "', "
                 + newCustomer.getDivision().getDivId() + ")";
@@ -209,22 +208,28 @@ public class DBCustomers {
 
     /**
      This method is responsible for sending a SQL UPDATE command to the database to update a current Customer record.
-     @param customer the Customer object being updated in the database.
+     @param newCustomer the Customer object being updated in the database.
      @throws SQLException the potential SQLException that must be caught or declared to be thrown.
      */
-    public static void updateProjectCustomer(ProjectCustomer customer) throws SQLException {
+    public static void updateProjectCustomer(ProjectCustomer newCustomer) throws SQLException {
+        // first remove the old customer from allProjectCustomers and allCustomers, then add the newCustomer to both
+        allCustomers.removeIf(customer -> customer.getId() == newCustomer.getId());
+        allProjectCustomers.removeIf(projectCustomer -> projectCustomer.getId() == newCustomer.getId());
+        allCustomers.add(newCustomer);
+        allProjectCustomers.add(newCustomer);
+
         // the updated customer object is passed in as parameter customer
         Connection conn = DBConnection.getConnection();
         String sql = "UPDATE customers " +
-                "SET Customer_Name=" + "'" + customer.getName() + "', " +
-                "Address=" + "'" + customer.getAddress() + "', " +
-                "Postal_Code=" + "'" + customer.getZipCode() + "', " +
-                "Phone=" + "'" + customer.getPhoneNum() + "', " +
-                "Special=" + "'" + customer.getProjectName() + "', " +
+                "SET Customer_Name=" + "'" + newCustomer.getName() + "', " +
+                "Address=" + "'" + newCustomer.getAddress() + "', " +
+                "Postal_Code=" + "'" + newCustomer.getZipCode() + "', " +
+                "Phone=" + "'" + newCustomer.getPhoneNum() + "', " +
+                "Special=" + "'" + newCustomer.getProjectName() + "', " +
                 "Last_Updated_By=" + "'" + User.user.getUsername() + "', " +
                 "Last_Update=now(), " +
-                "Division_ID=" + customer.getDivision().getDivId() + " " +
-                "WHERE Customer_ID = " + customer.getId();
+                "Division_ID=" + newCustomer.getDivision().getDivId() + " " +
+                "WHERE Customer_ID = " + newCustomer.getId();
 
         // Prepared Statement
         DBQuery.setPreparedStatement(conn, sql);
@@ -232,22 +237,27 @@ public class DBCustomers {
 
         // Prepared Statement executed, add customer to DBCustomers allCustomers
         ps.execute();
-
     }
 
-    public static void updateFinanceCustomer(FinanceCustomer customer) throws SQLException {
+    public static void updateFinanceCustomer(FinanceCustomer newCustomer) throws SQLException {
+        // first remove the old customer from allFinanceCustomers and allCustomers, then add the newCustomer to both
+        allCustomers.removeIf(customer -> customer.getId() == newCustomer.getId());
+        allFinanceCustomers.removeIf(financeCustomer -> financeCustomer.getId() == newCustomer.getId());
+        allCustomers.add(newCustomer);
+        allFinanceCustomers.add(newCustomer);
+
         // the updated customer object is passed in as parameter customer
         Connection conn = DBConnection.getConnection();
         String sql = "UPDATE customers " +
-                "SET Customer_Name=" + "'" + customer.getName() + "', " +
-                "Address=" + "'" + customer.getAddress() + "', " +
-                "Postal_Code=" + "'" + customer.getZipCode() + "', " +
-                "Phone=" + "'" + customer.getPhoneNum() + "', " +
-                "Special=" + "'" + String.valueOf(customer.includesCrypto()) + "', " +
+                "SET Customer_Name=" + "'" + newCustomer.getName() + "', " +
+                "Address=" + "'" + newCustomer.getAddress() + "', " +
+                "Postal_Code=" + "'" + newCustomer.getZipCode() + "', " +
+                "Phone=" + "'" + newCustomer.getPhoneNum() + "', " +
+                "Special=" + "'" + newCustomer.includesCrypto() + "', " +
                 "Last_Updated_By=" + "'" + User.user.getUsername() + "', " +
                 "Last_Update=now(), " +
-                "Division_ID=" + customer.getDivision().getDivId() + " " +
-                "WHERE Customer_ID = " + customer.getId();
+                "Division_ID=" + newCustomer.getDivision().getDivId() + " " +
+                "WHERE Customer_ID = " + newCustomer.getId();
 
         // Prepared Statement
         DBQuery.setPreparedStatement(conn, sql);
@@ -255,6 +265,5 @@ public class DBCustomers {
 
         // Prepared Statement executed, add customer to DBCustomers allCustomers
         ps.execute();
-
     }
 }

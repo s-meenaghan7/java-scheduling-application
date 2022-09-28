@@ -139,16 +139,17 @@ public class DBAppointments {
 
     /**
      This method is responsible for sending a SQL UPDATE command to the database to update a current Appointment record.
-     @param appointment the Appointment object being updated in the database.
+     @param newAppointment the Appointment object being updated in the database.
      @throws SQLException the potential SQLException that must be caught or declared to be thrown.
      */
-    public static void updateAppointment(Appointment appointment) throws SQLException {
-        // the updated appointment object is passed in as parameter appointment
-        // when this method finishes running, the screen will be changed back to the mainscreen and the setAppointments method will run again.
+    public static void updateAppointment(Appointment newAppointment) throws SQLException {
+        // First delete the old object, then add the new.
+        allAppointments.removeIf(a -> a.getAppointmentId() == newAppointment.getAppointmentId());
+        allAppointments.add(newAppointment);
 
         // convert start/end LocalDateTime objects into ZonedDateTime for the same instant but with UTC timezone
-        ZonedDateTime startZoned = appointment.getStart().atZone(ZoneId.systemDefault()).withZoneSameInstant(ZoneId.of("UTC"));
-        ZonedDateTime endZoned = appointment.getEnd().atZone(ZoneId.systemDefault()).withZoneSameInstant(ZoneId.of("UTC"));
+        ZonedDateTime startZoned = newAppointment.getStart().atZone(ZoneId.systemDefault()).withZoneSameInstant(ZoneId.of("UTC"));
+        ZonedDateTime endZoned = newAppointment.getEnd().atZone(ZoneId.systemDefault()).withZoneSameInstant(ZoneId.of("UTC"));
 
         // convert ZonedDateTime back to LocalDateTime for insertion to DB
         LocalDateTime startTime = startZoned.toLocalDateTime();
@@ -157,17 +158,17 @@ public class DBAppointments {
         Connection conn = DBConnection.getConnection();
 
         String sql = "UPDATE appointments " +
-                "SET Title=" + "'" + appointment.getTitle() + "', " +
-                "Description=" + "'" + appointment.getDescription() + "', " +
-                "Location=" + "'" + appointment.getLocation() + "', " +
+                "SET Title=" + "'" + newAppointment.getTitle() + "', " +
+                "Description=" + "'" + newAppointment.getDescription() + "', " +
+                "Location=" + "'" + newAppointment.getLocation() + "', " +
                 "Start=" + "'" + startTime + "', " +
                 "End=" + "'" + endTime + "', " +
                 "Last_Update=now(), " +
                 "Last_Updated_By=" + "'" + User.user.getUsername() + "', " +
-                "Customer_ID=" + appointment.getCustomerId() + ", " +
-                "User_ID=" + appointment.getUserId() + ", " +
-                "Contact_ID=" + appointment.getContact().getId() + " " +
-                "WHERE Appointment_ID=" + appointment.getAppointmentId();
+                "Customer_ID=" + newAppointment.getCustomerId() + ", " +
+                "User_ID=" + newAppointment.getUserId() + ", " +
+                "Contact_ID=" + newAppointment.getContact().getId() + " " +
+                "WHERE Appointment_ID=" + newAppointment.getAppointmentId();
 
         // Prepared Statement
         DBQuery.setPreparedStatement(conn, sql);
