@@ -4,6 +4,7 @@ import dao.DBCustomers;
 import dao.DBUsers;
 import java.util.List;
 import java.time.LocalDateTime;
+import java.util.NoSuchElementException;
 
 /**
  This class defines Appointment objects.
@@ -129,6 +130,6 @@ public class Appointment {
             if (customer.getId() == customerId) return customer;
         }
 
-        return null; // todo: throw an exception
+        throw new NoSuchElementException();
     }
 }

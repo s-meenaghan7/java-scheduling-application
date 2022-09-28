@@ -11,8 +11,10 @@ import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import utils.DBConnection;
+import utils.PasswordManager;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
 
 public class SchedulingSystem extends Application {
@@ -26,7 +28,7 @@ public class SchedulingSystem extends Application {
         stage.show();
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws NoSuchAlgorithmException {
         /*
         todo: create a way for the user to choose whether to connect locally or remotely
          for now, connection defaults to local.
