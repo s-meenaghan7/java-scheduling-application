@@ -40,12 +40,12 @@
                 <Button layoutX="555.0" layoutY="250.0" mnemonicParsing="false" onAction="#deleteCustomerButtonHandler" prefHeight="38.0" prefWidth="94.0" text="Delete" />
                 <Label fx:id="customerConfirmationText" alignment="CENTER_RIGHT" layoutX="500.0" layoutY="20.0" prefHeight="18.0" prefWidth="239.0" />
                 <TextField fx:id="customerSearchField" layoutX="68.0" layoutY="12.0" prefHeight="25.0" prefWidth="190.0" promptText="Search by ID or Name..." />
-                <RadioButton fx:id="allCustomerButton" layoutX="48.0" layoutY="50.0" mnemonicParsing="false" onAction="#custRadioButtonChanged" selected="true" text="All Customers">
+                <RadioButton fx:id="allCustomerButton" layoutX="48.0" layoutY="50.0" mnemonicParsing="false" onAction="#customerRadioButtonChanged" selected="true" text="All Customers">
                     <toggleGroup>
                         <ToggleGroup fx:id="customerViewToggleGroup" />
                     </toggleGroup></RadioButton>
-                <RadioButton fx:id="projectCustomerButton" layoutX="316.0" layoutY="50.0" mnemonicParsing="false" onAction="#custRadioButtonChanged" text="Project Customers" toggleGroup="$customerViewToggleGroup" />
-                <RadioButton fx:id="financialCustomerButton" layoutX="589.0" layoutY="50.0" mnemonicParsing="false" onAction="#custRadioButtonChanged" text="Finance Customers" toggleGroup="$customerViewToggleGroup" />
+                <RadioButton fx:id="projectCustomerButton" layoutX="316.0" layoutY="50.0" mnemonicParsing="false" onAction="#customerRadioButtonChanged" text="Project Customers" toggleGroup="$customerViewToggleGroup" />
+                <RadioButton fx:id="financialCustomerButton" layoutX="589.0" layoutY="50.0" mnemonicParsing="false" onAction="#customerRadioButtonChanged" text="Finance Customers" toggleGroup="$customerViewToggleGroup" />
             </children>
         </AnchorPane>
         <AnchorPane layoutX="20.0" layoutY="150.0" prefHeight="288.0" prefWidth="755.0" style="-fx-border-color: black; -fx-border-radius: 10;">
@@ -70,7 +70,7 @@
                 <Button layoutX="94.0" layoutY="241.0" mnemonicParsing="false" onAction="#addAppointmentButtonHandler" prefHeight="38.0" prefWidth="94.0" text="Add" />
                 <Button layoutX="330.0" layoutY="241.0" mnemonicParsing="false" onAction="#updateAppointmentButtonHandler" prefHeight="38.0" prefWidth="94.0" text="Update" />
                 <Button layoutX="555.0" layoutY="241.0" mnemonicParsing="false" onAction="#deleteAppointmentButtonHandler" prefHeight="38.0" prefWidth="94.0" text="Delete" />
-                <Label fx:id="aptConfirmationText" alignment="CENTER_RIGHT" layoutX="494.0" layoutY="17.0" prefHeight="18.0" prefWidth="239.0" />
+                <Label fx:id="appointmentConfirmText" alignment="CENTER_RIGHT" layoutX="494.0" layoutY="17.0" prefHeight="18.0" prefWidth="239.0" />
                 <RadioButton fx:id="allAptButton" layoutX="50.0" layoutY="54.0" mnemonicParsing="false" onAction="#appointmentRadioButtonChanged" selected="true" text="All Appointments">
                     <toggleGroup>
                         <ToggleGroup fx:id="aptViewToggleGroup" />
