@@ -34,6 +34,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Region;
 
+import static utils.Utils.isNumber;
+
 /**
  FXML Update Appointment Screen Controller class
  @author Sean
@@ -58,7 +60,7 @@ public class UpdateAppointmentController implements Initializable {
     @FXML private Label errorText;
     @FXML private Label timeZoneInfo;
 
-    public static Appointment selectedApt;
+    public static Appointment selectedAppointment;
 
     /**
      Called to initialize the Update Appointment screen controller class after its root element has been completely processed.
@@ -82,9 +84,8 @@ public class UpdateAppointmentController implements Initializable {
      This method is responsible for populating the Contacts ComboBox with only the Contacts
      that provide the consultation services to the selected Customer, based on the Customer's subclass.
      @param event
-     @throws IOException
      */
-    public void customerChangedHandler(ActionEvent event) throws IOException {
+    public void customerChangedHandler(ActionEvent event) {
         List<Contact> contacts = new ArrayList<>();
 
         DBContacts.getAllContacts().forEach(c -> {
@@ -142,8 +143,7 @@ public class UpdateAppointmentController implements Initializable {
      @throws IOException the potential IOException that must be caught or declared to be thrown.
      */
     public void cancelButtonHandler(ActionEvent event) throws IOException {
-        SceneChanger sc = new SceneChanger();
-        sc.changeSceneTo(event, "/View/MainScreen.fxml");
+        SceneChanger.changeSceneTo(event, "/View/MainScreen.fxml");
     }
 
     /**
@@ -151,23 +151,22 @@ public class UpdateAppointmentController implements Initializable {
      retrieved from the user's previously selected Appointment.These values are populated into their respective data fields to allow the user to make
      changes to as many or little of the fields as desired.
      @param event
-     @throws java.io.IOException
      */
-    public void initializeFields(ActionEvent event) throws IOException { // possibly add ActionEvent event arg
+    public void initializeFields(ActionEvent event) {
 
-        idField.setText(Integer.toString(selectedApt.getAppointmentId()));
-        titleField.setText(selectedApt.getTitle());
-        descriptionField.setText(selectedApt.getDescription());
-        locationField.setText(selectedApt.getLocation());
+        idField.setText(Integer.toString(selectedAppointment.getAppointmentId()));
+        titleField.setText(selectedAppointment.getTitle());
+        descriptionField.setText(selectedAppointment.getDescription());
+        locationField.setText(selectedAppointment.getLocation());
 
-        customerField.getSelectionModel().select(selectedApt.getCustomer(selectedApt.getCustomerId()));
+        customerField.getSelectionModel().select(selectedAppointment.getCustomer(selectedAppointment.getCustomerId()));
         customerChangedHandler(event);
-        contactField.getSelectionModel().select(selectedApt.getContact());
+        contactField.getSelectionModel().select(selectedAppointment.getContact());
 
         // initialize the date and time ComboBoxes for this screen
-        aptDatePicker.setValue(selectedApt.getStart().toLocalDate());
-        startTimePicker.setValue(selectedApt.getStart().toLocalTime());
-        endTimePicker.setValue(selectedApt.getEnd().toLocalTime());
+        aptDatePicker.setValue(selectedAppointment.getStart().toLocalDate());
+        startTimePicker.setValue(selectedAppointment.getStart().toLocalTime());
+        endTimePicker.setValue(selectedAppointment.getEnd().toLocalTime());
 
     }
 
@@ -197,22 +196,6 @@ public class UpdateAppointmentController implements Initializable {
     }
 
     /**
-     This helper method checks if a parameter String s is a number or contains numbers. Used by the validateFields method to check the TextFields of the screen.
-     @param s the String to check for if it is a number or contains numbers.
-     @return true the return value returned if none of the parameter's characters are digits.
-     */
-    public boolean isNumber(String s) {
-        //loop through the input String's characters
-        for (int i = 0; i < s.length(); i++) {
-
-            if (!Character.isDigit(s.charAt(i))) return false;
-
-        }
-        //returns true only if none of the String's characters are digits
-        return true;
-    }
-
-    /**
      This method checks each field on this screen, from top to bottom, ensuring a proper data value has been entered by the user.
      If a field is blank or contains unsuitable data, a text label will populate to alert the user to any errors to correct. Only returns true if all fields are valid.
      @return true the value to return if all fields on screen are valid. Otherwise, returns false.
@@ -236,18 +219,23 @@ public class UpdateAppointmentController implements Initializable {
 
             errorText.setText("Location field input invalid.");
             return false;
+
         } else if (contactField.getSelectionModel().isEmpty()) {
             errorText.setText("Please select a contact.");
             return false;
+
         } else if (customerField.getSelectionModel().isEmpty()) {
             errorText.setText("Please select a customer.");
             return false;
+
         } else if (aptDatePicker.getValue() == null) {
             errorText.setText("Select a valid date.");
             return false;
+
         } else if (startTimePicker.getSelectionModel().isEmpty()) {
             errorText.setText("Select an appropriate start time.");
             return false;
+
         } else if (endTimePicker.getSelectionModel().isEmpty() ||
                 endTimePicker.getSelectionModel().getSelectedItem().equals(startTimePicker.getSelectionModel().getSelectedItem()) ||
                 endTimePicker.getSelectionModel().getSelectedItem().isBefore(startTimePicker.getSelectionModel().getSelectedItem())) {
@@ -314,7 +302,7 @@ public class UpdateAppointmentController implements Initializable {
             // newStart and newEnd should both be before aptStart or both be after aptEnd
             if ((newStart.isBefore(aptStart) && (newEnd.isBefore(aptStart) || newEnd.isEqual(aptStart)) ||
                     (newEnd.isAfter(aptEnd) && (newStart.isAfter(aptEnd) || newStart.isEqual(aptEnd)))) ||
-                    appointment.getAppointmentId() == selectedApt.getAppointmentId()) {
+                    appointment.getAppointmentId() == selectedAppointment.getAppointmentId()) {
                 // do nothing, continue looping
 
             } else { // if one of the above conditions did not eval to true, throw this alert

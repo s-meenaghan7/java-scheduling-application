@@ -41,9 +41,7 @@ public class CustomerSchedulingController implements Initializable {
 
     /**
      Called to initialize the Customer Scheduling controller class after its root element has been completely processed.
-     Sets ComboBox items and sets TableColumn cell properties. LAMBDA: Both lambda expressions in this method perform the same operation. Each lambda
-     expression is used to initialize their respective TableColumns with formatted LocalDateTime objects. This is necessary so that the LocalDateTime
-     objects display in a more attractive and human-readable format.
+     Sets ComboBox items and sets TableColumn cell properties.
      @param url The location used to resolve relative paths for the root object, or null if the location is not known.
      @param rb The resources used to localize the root object, or null if the root object was not localized.
      */
@@ -65,9 +63,8 @@ public class CustomerSchedulingController implements Initializable {
      contained in the database, checking for appointments that have the same Customer ID as the selected customer from the ComboBox. The selected customer's
      appointments are then displayed in a TableView.
      @param event the event object representing the customerField ComboBox selection being changed.
-     @throws IOException the potential IOException that must be caught or declared to be thrown.
      */
-    public void customerFieldChanged(ActionEvent event) throws IOException {
+    public void customerFieldChanged(ActionEvent event) {
         Customer selectedCustomer = customerField.getSelectionModel().getSelectedItem();
 
         List<Appointment> allAppointments = DBAppointments.getAllAppointments();
@@ -90,8 +87,7 @@ public class CustomerSchedulingController implements Initializable {
      @throws IOException the potential IOException that must be caught or declared to be thrown.
      */
     public void backButtonHandler(ActionEvent event) throws IOException {
-        SceneChanger sc = new SceneChanger();
-        sc.changeSceneTo(event, "/View/MainScreen.fxml");
+        SceneChanger.changeSceneTo(event, "MainScreen.fxml");
     }
 
 }

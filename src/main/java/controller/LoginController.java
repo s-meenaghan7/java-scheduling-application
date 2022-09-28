@@ -1,11 +1,8 @@
 package controller;
 
 import java.io.*;
-import dao.DBContacts;
-import dao.DBCountries;
-import dao.DBDivisions;
-import dao.DBAppointments;
-import dao.DBUsers;
+
+import dao.*;
 import model.User;
 import model.Appointment;
 import utils.PasswordManager;
@@ -59,6 +56,7 @@ public class LoginController implements Initializable {
             DBContacts.setAllContacts();
             DBCountries.setAllCountries();
             DBDivisions.setAllDivisions();
+            DBCustomers.setAllCustomers();
             DBAppointments.setAllAppointments();
         } catch (SQLException e) { e.printStackTrace(); }
 

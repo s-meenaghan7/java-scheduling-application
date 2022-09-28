@@ -7,7 +7,6 @@ import dao.DBAppointments;
 import model.Contact;
 import model.Customer;
 import model.Appointment;
-import model.FinanceCustomer;
 import model.ProjectCustomer;
 import model.User;
 import utils.SceneChanger;
@@ -22,7 +21,6 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.stream.Collectors;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.event.ActionEvent;
@@ -35,6 +33,8 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Alert.AlertType;
+
+import static utils.Utils.isNumber;
 
 /**
  FXML Add Appointment Screen Controller class
@@ -69,32 +69,33 @@ public class AddAppointmentController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
 
+        // set times and populate customerField ComboBox with customer data
         startTimePicker.setItems(initializeTimes());
         endTimePicker.setItems(initializeTimes());
-
         customerField.setItems(DBCustomers.getAllCustomers());
 
-        timeZoneInfo.setText("Times input below are in your local timezone: " + ZoneId.systemDefault().toString());
+        timeZoneInfo.setText("Times input below are in your local timezone: " + ZoneId.systemDefault());
 
     }
 
     /**
      This method is responsible for populating the Contacts ComboBox with only the Contacts
-     that provide the consultation services to the selected Customer, based on the Customer's subclass.
-     @param event
-     @throws IOException
+     that provide the consultation services to the selected Customer, based on the selected Customer's subclass.
+     @param event the event
      */
-    public void customerChangedHandler(ActionEvent event) throws IOException {
+    public void customerChangedHandler(ActionEvent event) {
         List<Contact> contacts = new ArrayList<>();
+        ObservableList<Contact> filteredContacts = FXCollections.observableArrayList(contacts);
+        boolean selectedIsProjectCustomer = customerField.getSelectionModel().getSelectedItem() instanceof ProjectCustomer;
 
         for (Contact c : DBContacts.getAllContacts()) {
-            if ((customerField.getSelectionModel().getSelectedItem() instanceof ProjectCustomer) && (c.getType().equals("project")))
-                contacts.add(c);
-            else if ((customerField.getSelectionModel().getSelectedItem() instanceof FinanceCustomer) && (c.getType().equals("finance")))
-                contacts.add(c);
+            if ((selectedIsProjectCustomer) && (c.getType().equals("project")))
+                filteredContacts.add(c);
+            else if ((!selectedIsProjectCustomer) && (c.getType().equals("finance")))
+                filteredContacts.add(c);
         }
 
-        ObservableList<Contact> filteredContacts = FXCollections.observableArrayList(contacts);
+//        ObservableList<Contact> filteredContacts = FXCollections.observableArrayList(contacts);
         contactField.setItems(filteredContacts);
     }
 
@@ -121,7 +122,8 @@ public class AddAppointmentController implements Initializable {
         if (!validateAppointmentTime(start, end)) return;
 
         // create newAppointment object from fields
-        Appointment newAppointment = new Appointment(titleField.getText(),
+        Appointment newAppointment = new Appointment(
+                titleField.getText(),
                 descriptionField.getText(),
                 locationField.getText(),
                 contactField.getValue(),
@@ -130,9 +132,7 @@ public class AddAppointmentController implements Initializable {
                 User.user.getId());
 
         DBAppointments.addAppointment(newAppointment);
-
-        SceneChanger sc = new SceneChanger();
-        sc.changeSceneTo(event, "/View/MainScreen.fxml");
+        cancelButtonHandler(event);
     }
 
     /**
@@ -141,8 +141,7 @@ public class AddAppointmentController implements Initializable {
      @throws IOException the potential IOException that must be caught or declared to be thrown.
      */
     public void cancelButtonHandler(ActionEvent event) throws IOException {
-        SceneChanger sc = new SceneChanger();
-        sc.changeSceneTo(event, "/View/MainScreen.fxml");
+        SceneChanger.changeSceneTo(event, "MainScreen.fxml");
     }
 
     /**
@@ -171,40 +170,23 @@ public class AddAppointmentController implements Initializable {
     }
 
     /**
-     This helper method checks if a parameter String s is a number or contains numbers. Used by the validateFields method to check the TextFields of the screen.
-     @param s the String to check for if it is a number or contains numbers.
-     @return true the return value returned if none of the parameter's characters are digits.
-     */
-    public boolean isNumber(String s) {
-        //loop through the input String's characters
-        for (int i = 0; i < s.length(); i++) {
-
-            if (Character.isDigit(s.charAt(i)) == false) return false;
-
-        }
-        //returns true only if none of the String's characters are digits
-        return true;
-    }
-
-    /**
      This method checks each field on this screen, from top to bottom, ensuring a proper data value has been entered by the user.
      If a field is blank or contains unsuitable data, a text label will populate to alert the user to any errors to correct. Only returns true if all fields are valid.
      @return true the value to return if all fields on screen are valid. Otherwise, returns false.
      */
     public boolean validateFields() {
-        // title field
         if (titleField.getText().isBlank() ||
                 isNumber(titleField.getText())) {
 
             errorText.setText("Title field input invalid.");
             return false;
-            // description
+
         } else if (descriptionField.getText().isBlank() ||
                 isNumber(descriptionField.getText())) {
 
             errorText.setText("Description field input invalid.");
             return false;
-            // Location
+
         } else if (locationField.getText().isBlank() ||
                 isNumber(locationField.getText())) {
 
@@ -214,15 +196,19 @@ public class AddAppointmentController implements Initializable {
         } else if (contactField.getSelectionModel().isEmpty()) {
             errorText.setText("Please select a contact.");
             return false;
+
         } else if (customerField.getSelectionModel().isEmpty()) {
             errorText.setText("Please select a customer.");
             return false;
+
         } else if (aptDatePicker.getValue() == null || aptDatePicker.getValue().isBefore(LocalDate.now())) {
             errorText.setText("Select a valid date. Past dates are not allowed.");
             return false;
+
         } else if (startTimePicker.getSelectionModel().isEmpty()) {
             errorText.setText("Select an appropriate start time.");
             return false;
+
         } else if (endTimePicker.getSelectionModel().isEmpty() ||
                 endTimePicker.getSelectionModel().getSelectedItem().equals(startTimePicker.getSelectionModel().getSelectedItem()) ||
                 endTimePicker.getSelectionModel().getSelectedItem().isBefore(startTimePicker.getSelectionModel().getSelectedItem())) {

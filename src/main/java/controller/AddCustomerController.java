@@ -26,6 +26,8 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
 
+import static utils.Utils.isNumber;
+
 /**
  FXML Add Customer Screen Controller class
  @author Sean
@@ -39,7 +41,7 @@ public class AddCustomerController implements Initializable {
     @FXML private ComboBox<Country> countryField;
     @FXML private ComboBox<FirstLevelDivision> divisionField;
 
-    @FXML private ToggleGroup customerTypeToggleGroup = new ToggleGroup();
+    @FXML private final ToggleGroup customerTypeToggleGroup = new ToggleGroup();
     @FXML private RadioButton projectRadioButton;
     @FXML private RadioButton financeRadioButton;
 
@@ -87,13 +89,10 @@ public class AddCustomerController implements Initializable {
     /**
      This method is responsible for filtering the selection of First Level divisions (states, provinces, etc) in the divisionField.
      Selection of a given country will filter the divisionField to only show First level divisions associated with it. For example, choosing "U.S"
-     for country will populate the divisionField with U.S states, but no Canadian provinces will be displayed. LAMBDA: This lambda expression is justified
-     by the need to filter the list of all FirstLevelDivisions to only include those FirstLevelDivisions from the specified Country. This lambda expression
-     filters out any FirstLevelDivisions that are not apart of or associated with the specified Country.
+     for country will populate the divisionField with U.S states, but no Canadian provinces will be displayed.
      @param event the event representing the change or action made to the ComboBox countryField.
-     @throws IOException the potential IOException that must be caught or declared to be thrown.
      */
-    public void countryChangedHandler(ActionEvent event) throws IOException {
+    public void countryChangedHandler(ActionEvent event) {
 
         List<FirstLevelDivision> divs = DBDivisions.getAllDivisions().stream()
                 .filter(d -> d.getCountryId() == countryField.getSelectionModel().getSelectedItem().getId())
@@ -116,7 +115,8 @@ public class AddCustomerController implements Initializable {
         if (!validNewCustomer()) return; // if fields !valid, do not continue.
 
         if (customerTypeToggleGroup.getSelectedToggle().equals(projectRadioButton)) {
-            ProjectCustomer newProCustomer = new ProjectCustomer(nameField.getText().trim(),
+            ProjectCustomer projectCustomer = new ProjectCustomer(
+                    nameField.getText().trim(),
                     addressField.getText().trim(),
                     postalField.getText().trim(),
                     phoneField.getText().trim(),
@@ -124,12 +124,13 @@ public class AddCustomerController implements Initializable {
                     divisionField.getSelectionModel().getSelectedItem(),
                     customerSpecialField.getText().trim());
 
-            DBCustomers.addProjectCustomer(newProCustomer);
+            DBCustomers.addProjectCustomer(projectCustomer);
             cancelButtonHandler(event);
         }
 
         else if (customerTypeToggleGroup.getSelectedToggle().equals(financeRadioButton)) {
-            FinanceCustomer newFinCustomer = new FinanceCustomer(nameField.getText().trim(),
+            FinanceCustomer financeCustomer = new FinanceCustomer(
+                    nameField.getText().trim(),
                     addressField.getText().trim(),
                     postalField.getText().trim(),
                     phoneField.getText().trim(),
@@ -137,10 +138,9 @@ public class AddCustomerController implements Initializable {
                     divisionField.getSelectionModel().getSelectedItem(),
                     customerSpecialField.getText().toLowerCase().charAt(0) == 'y');
 
-            DBCustomers.addFinanceCustomer(newFinCustomer);
+            DBCustomers.addFinanceCustomer(financeCustomer);
             cancelButtonHandler(event);
         }
-
     }
 
     /**
@@ -149,24 +149,7 @@ public class AddCustomerController implements Initializable {
      @throws IOException the potential IOException that must be caught or declared to be thrown.
      */
     public void cancelButtonHandler(ActionEvent event) throws IOException {
-        SceneChanger sc = new SceneChanger();
-        sc.changeSceneTo(event, "/View/MainScreen.fxml");
-    }
-
-    /**
-     This helper method checks if a parameter String s is a number or contains numbers. Used by the validateFields method to check the TextFields of the screen.
-     @param s the String to check for if it is a number or contains numbers.
-     @return true the return value returned if none of the parameter's characters are digits.
-     */
-    public boolean isNumber(String s) {
-        //loop through the input String's characters
-        for (int i = 0; i < s.length(); i++) {
-
-            if (Character.isDigit(s.charAt(i)) == false) return false;
-
-        }
-        //returns true only if none of the String's characters are digits
-        return true;
+        SceneChanger.changeSceneTo(event, "MainScreen.fxml");
     }
 
     /**
@@ -197,16 +180,20 @@ public class AddCustomerController implements Initializable {
                 postalField.getText().trim().length() > 50) {
             errorTextField.setText("Postal code field input invalid");
             return false;
+
         } else if (phoneField.getText().isBlank() ||
                 phoneField.getText().trim().length() > 50) {
             errorTextField.setText("Phone number field input invalid");
             return false;
+
         } else if (countryField.getSelectionModel().isEmpty()) {
             errorTextField.setText("Please select a country");
             return false;
+
         } else if (divisionField.getSelectionModel().isEmpty()) {
             errorTextField.setText("Please select a state/province");
             return false;
+
         } else if (customerTypeToggleGroup.getSelectedToggle().equals(this.projectRadioButton)) {
             if (customerSpecialField.getText().length() > 50 ||
                     customerSpecialField.getText().isBlank() ||
@@ -218,6 +205,7 @@ public class AddCustomerController implements Initializable {
             if (customerSpecialField.getText().trim().equalsIgnoreCase("yes") ||
                     customerSpecialField.getText().trim().equalsIgnoreCase("no")) {
                 // do nothing
+                // todo invert this if statement to simplify
             } else {
                 errorTextField.setText("Please only specify 'yes' OR 'no' about cryptocurrency");
                 return false;

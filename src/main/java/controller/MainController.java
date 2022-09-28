@@ -8,6 +8,7 @@ import model.Customer;
 import model.FinanceCustomer;
 import model.ProjectCustomer;
 import model.User;
+import my.app.schedulingsystem.SchedulingSystem;
 import utils.SceneChanger;
 import java.time.LocalDateTime;
 import java.io.IOException;
@@ -55,7 +56,7 @@ import utils.Utils;
 public class MainController implements Initializable {
 
     @FXML private Label userInfo;
-    @FXML private Label aptConfirmationText;
+    @FXML private Label appointmentConfirmText;
     @FXML private Label customerConfirmationText;
 
     @FXML private RadioButton allAptButton;
@@ -105,7 +106,7 @@ public class MainController implements Initializable {
 
         userInfo.setText("User: " + User.user.getUsername());
 
-        // columnName.setCellValueFactory(new PropertyValueFactory<>("variableName"));
+        // Appointments Tableview
         appointmentIdCol.setCellValueFactory(new PropertyValueFactory<>("appointmentId"));
         appointmentTitleCol.setCellValueFactory(new PropertyValueFactory<>("title"));
         appointmentDescCol.setCellValueFactory(new PropertyValueFactory<>("description"));
@@ -115,6 +116,7 @@ public class MainController implements Initializable {
         appointmentEndCol.setCellValueFactory(s -> new SimpleStringProperty(s.getValue().getEnd().format(dtf)));
         appointmentCustomerIdCol.setCellValueFactory(new PropertyValueFactory<>("customerId"));
 
+        // Customers Tableview
         customerIdCol.setCellValueFactory(new PropertyValueFactory<>("id"));
         customerNameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
         customerPhoneCol.setCellValueFactory(new PropertyValueFactory<>("phoneNum"));
@@ -123,13 +125,13 @@ public class MainController implements Initializable {
         customerCountryCol.setCellValueFactory(new PropertyValueFactory<>("country"));
         customerZipCol.setCellValueFactory(new PropertyValueFactory<>("zipCode"));
 
-        try {
-            // these stay here, they must run after UPDATING appointments or customers and returning to this screen
-            DBAppointments.setAllAppointments();
-            DBCustomers.setAllCustomers();
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
+//        try {
+//            // todo: test updates made to eliminate this code, once runnable
+////            DBAppointments.setAllAppointments();
+////            DBCustomers.setAllCustomers();
+//        } catch (SQLException e) {
+//            System.out.println(e.getMessage());
+//        }
 
         FilteredList<Appointment> filteredAppointments = new FilteredList<>(DBAppointments.getAllAppointments(), p -> true);
         appointmentSearchHandler(appointmentsTableView, appointmentSearchField, filteredAppointments);
@@ -219,7 +221,7 @@ public class MainController implements Initializable {
      This method is responsible for filtering the CustomersTableView, showing either a) all the customers in the database, b) only ProjectCustomers in the database,
      or c) only FinanceCustomers in the database.
      */
-    public void custRadioButtonChanged() {
+    public void customerRadioButtonChanged() {
 
         if (this.customerViewToggleGroup.getSelectedToggle().equals(this.allCustomerButton)) {
             FilteredList<Customer> allCustomers = new FilteredList<>(DBCustomers.getAllCustomers(), p -> true);
@@ -247,7 +249,7 @@ public class MainController implements Initializable {
             if (Utils.isNumber(newValue)) {
                 Appointment current = DBAppointments.lookupAppointment(appointment.getAppointmentId());
 
-                /*
+                /* todo: test searching, to ensure this code removal is OK
                 if (String.valueOf(current.getAppointmentId()).contains(lowerCaseValue))
                     return true; // filter matches appointmentId
                  */
@@ -284,7 +286,7 @@ public class MainController implements Initializable {
             if (Utils.isNumber(newValue)) {
                 Customer current = DBCustomers.lookupCustomer(customer.getId());
 
-                /*
+                /* todo: test searching, to ensure this code removal is OK
                 if (String.valueOf(current.getId()).contains(lowerCaseValue))
                     return true; // filter matches appointmentId
                  */
@@ -317,7 +319,7 @@ public class MainController implements Initializable {
      @throws IOException the potential IOException that must be caught or declared to be thrown.
      */
     public void addAppointmentButtonHandler(ActionEvent event) throws IOException {
-        SceneChanger.changeSceneTo(event, "AddAptScreen.fxml");
+        SceneChanger.changeSceneTo(event, "AddAppointmentScreen.fxml");
     }
 
     /**
@@ -332,11 +334,11 @@ public class MainController implements Initializable {
         // check if a selection has been made or not
         if (!appointmentsTableView.getSelectionModel().isEmpty()) {
             // store selected appointment to public static selectedApt from UpdateAppointmentController
-            UpdateAppointmentController.selectedApt = appointmentsTableView.getSelectionModel().getSelectedItem();
+            UpdateAppointmentController.selectedAppointment = appointmentsTableView.getSelectionModel().getSelectedItem();
 
             //create FXMLLoader
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("/View/UpdateAptScreen.fxml"));
+            loader.setLocation(SchedulingSystem.class.getResource("UpdateAptScreen.fxml"));
             Parent newScene = loader.load();
 
             //access the controller from the loader and call initializeFields() method to pass data into fields
@@ -371,12 +373,11 @@ public class MainController implements Initializable {
      to confirm that they would like to delete the selected appointment. The user may confirm and delete the appointment, or cancel the operation by
      pressing Cancel.
      @param event the event object representing the Delete Appointment button being pressed.
-     @throws IOException the potential IOException that must be caught or declared to be thrown.
      @throws SQLException  the potential SQLException that must be caught or declared to be thrown.
      */
     public void deleteAppointmentButtonHandler(ActionEvent event) throws SQLException {
         if (!appointmentsTableView.getSelectionModel().isEmpty()) {
-            aptConfirmationText.setText("");
+            appointmentConfirmText.setText("");
             Appointment appointmentToDelete = appointmentsTableView.getSelectionModel().getSelectedItem();
 
             Alert alert = new Alert(AlertType.CONFIRMATION);
@@ -401,11 +402,11 @@ public class MainController implements Initializable {
                 delAlert.setHeaderText("Successfully deleted Appointment ID: " + appointmentToDelete.getAppointmentId());
                 delAlert.show();
 
-            } else if (result.get() == cancel) aptConfirmationText.setText("Appointment was not deleted");
+            } else if (result.get() == cancel) appointmentConfirmText.setText("Appointment was not deleted");
 
         } else {
 
-            aptConfirmationText.setText("");
+            appointmentConfirmText.setText("");
             Alert alert = new Alert(AlertType.INFORMATION);
             alert.setResizable(true);
             alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
@@ -448,7 +449,7 @@ public class MainController implements Initializable {
 
             //create FXMLLoader
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("UpdateCustomerScreen.fxml"));
+            loader.setLocation(SchedulingSystem.class.getResource("UpdateCustomerScreen.fxml"));
             Parent newScene = loader.load();
 
             //access the controller from the loader and call initializeFields() method to pass data into fields
@@ -484,10 +485,9 @@ public class MainController implements Initializable {
      is generated to inform the user that the customer cannot be deleted until all associated appointments are first deleted. With no associated appointments
      for the selected customer, the user may successfully delete the customer from the database.
      @param event the event object representing the Delete Customer button being pressed.
-     @throws IOException the potential IOException that must be caught or declared to be thrown.
      @throws SQLException the potential SQLException that must be caught or declared to be thrown.
      */
-    public void deleteCustomerButtonHandler(ActionEvent event) throws IOException, SQLException {
+    public void deleteCustomerButtonHandler(ActionEvent event) throws SQLException {
         if (!customersTableView.getSelectionModel().isEmpty()) {
             Customer customerToDelete = customersTableView.getSelectionModel().getSelectedItem();
             Alert alert = new Alert(AlertType.CONFIRMATION);

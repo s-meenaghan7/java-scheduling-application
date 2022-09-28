@@ -27,6 +27,8 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 
+import static utils.Utils.isNumber;
+
 /**
  FXML Update Customer screen Controller class
  @author Sean
@@ -41,7 +43,7 @@ public class UpdateCustomerController implements Initializable {
     @FXML private ComboBox<Country> countryField;
     @FXML private ComboBox<FirstLevelDivision> divisionField;
 
-    @FXML private ToggleGroup customerTypeToggleGroup = new ToggleGroup();
+    @FXML private final ToggleGroup customerTypeToggleGroup = new ToggleGroup();
     @FXML private RadioButton projectRadioButton;
     @FXML private RadioButton financeRadioButton;
 
@@ -72,7 +74,6 @@ public class UpdateCustomerController implements Initializable {
 
         ObservableList<FirstLevelDivision> filteredDivs = FXCollections.observableArrayList(divs);
         divisionField.setItems(filteredDivs);
-
     }
 
     /**
@@ -97,13 +98,10 @@ public class UpdateCustomerController implements Initializable {
     /**
      This method is responsible for filtering the selection of First Level divisions (states, provinces, etc) in the divisionField.
      Selection of a given country will filter the divisionField to only show First level divisions associated with it. For example, choosing "U.S"
-     for country will populate the divisionField with U.S states, but no Canadian provinces will be displayed. LAMBDA: This lambda expression is
-     responsible for filtering the FirstLevelDivision ComboBox to only contain FirstLevelDivision objects that are associated with the chosen Country
-     from the countryField ComboBox.
+     for country will populate the divisionField with U.S states, but no Canadian provinces will be displayed.
      @param event the event representing the change or action made to the ComboBox countryField.
-     @throws IOException the potential IOException that must be caught or declared to be thrown.
      */
-    public void countryChangedHandler(ActionEvent event) throws IOException {
+    public void countryChangedHandler(ActionEvent event) {
 
         List<FirstLevelDivision> divs = DBDivisions.getAllDivisions().stream()
                 .filter(d -> d.getCountryId() == countryField.getSelectionModel().getSelectedItem().getId())
@@ -152,7 +150,6 @@ public class UpdateCustomerController implements Initializable {
             DBCustomers.updateFinanceCustomer(updatedFinCustomer);
             cancelButtonHandler(event);
         }
-
     }
 
     /**
@@ -161,8 +158,7 @@ public class UpdateCustomerController implements Initializable {
      @throws IOException the potential IOException that must be caught or declared to be thrown.
      */
     public void cancelButtonHandler(ActionEvent event) throws IOException {
-        SceneChanger sc = new SceneChanger();
-        sc.changeSceneTo(event, "/View/MainScreen.fxml");
+        SceneChanger.changeSceneTo(event, "MainScreen.fxml");
     }
 
     /**
@@ -180,7 +176,6 @@ public class UpdateCustomerController implements Initializable {
         countryField.getSelectionModel().select(selectedCustomer.getCountry());
         divisionField.getSelectionModel().select(selectedCustomer.getDivision());
 
-        // works in IMS app, so it should work here as well
         if (selectedCustomer instanceof ProjectCustomer) {
             projectRadioButton.setSelected(true);
             radioButtonChanged();
@@ -193,22 +188,6 @@ public class UpdateCustomerController implements Initializable {
 
         }
 
-    }
-
-    /**
-     This helper method checks if a parameter String s is a number or contains numbers. Used by the validateFields method to check the TextFields of the screen.
-     @param s the String to check for if it is a number or contains numbers.
-     @return true the return value returned if none of the parameter's characters are digits.
-     */
-    public boolean isNumber(String s) {
-        //loop through the input String's characters
-        for (int i = 0; i < s.length(); i++) {
-
-            if (Character.isDigit(s.charAt(i)) == false) return false;
-
-        }
-        //returns true only if none of the String's characters are digits
-        return true;
     }
 
     /**
@@ -239,16 +218,20 @@ public class UpdateCustomerController implements Initializable {
                 postalField.getText().trim().length() > 50) {
             errorTextField.setText("Postal code field input invalid");
             return false;
+
         } else if (phoneField.getText().isBlank() ||
                 phoneField.getText().trim().length() > 50) {
             errorTextField.setText("Phone number field input invalid");
             return false;
+
         } else if (countryField.getSelectionModel().isEmpty()) {
             errorTextField.setText("Please select a country");
             return false;
+
         } else if (divisionField.getSelectionModel().isEmpty()) {
             errorTextField.setText("Please select a state/province");
             return false;
+
         } else if (customerTypeToggleGroup.getSelectedToggle().equals(this.projectRadioButton)) {
             if (customerSpecialField.getText().length() > 50 ||
                     customerSpecialField.getText().isBlank() ||
@@ -260,6 +243,7 @@ public class UpdateCustomerController implements Initializable {
             if (customerSpecialField.getText().trim().equalsIgnoreCase("yes") ||
                     customerSpecialField.getText().trim().equalsIgnoreCase("no")) {
                 // do nothing
+                // todo invert the if to simplify code
             } else {
                 errorTextField.setText("Please only specify 'yes' OR 'no' about cryptocurrency");
                 return false;

@@ -36,16 +36,14 @@ public class ContactScheduleController implements Initializable {
     @FXML private TableColumn<Appointment, String> appointmentDescCol;
     @FXML private TableColumn<Appointment, String> appointmentStartCol;
     @FXML private TableColumn<Appointment, String> appointmentEndCol;
-    @FXML private TableColumn<Appointment, Integer> apptCustomerIdCol;
+    @FXML private TableColumn<Appointment, Integer> appointmentCustomerIdCol;
 
     private final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm");
 
 
     /**
      Called to initialize the Contact Schedules controller class after its root element has been completely processed.
-     Sets ComboBox items and sets TableColumn cell properties. LAMBDA: Both lambda expressions in this method perform the same operation. Each lambda
-     expression is used to initialize their respective TableColumns with formatted LocalDateTime objects. This is necessary so that the LocalDateTime
-     objects display in a more attractive and human-readable format.
+     Sets ComboBox items and sets TableColumn cell properties.
      @param url The location used to resolve relative paths for the root object, or null if the location is not known.
      @param rb The resources used to localize the root object, or null if the root object was not localized.
      */
@@ -59,18 +57,16 @@ public class ContactScheduleController implements Initializable {
         appointmentDescCol.setCellValueFactory(new PropertyValueFactory<>("description"));
         appointmentStartCol.setCellValueFactory(s -> new SimpleStringProperty(s.getValue().getStart().format(dtf)));
         appointmentEndCol.setCellValueFactory(s -> new SimpleStringProperty(s.getValue().getEnd().format(dtf)));
-        apptCustomerIdCol.setCellValueFactory(new PropertyValueFactory<>("customerId"));
+        appointmentCustomerIdCol.setCellValueFactory(new PropertyValueFactory<>("customerId"));
 
     }
 
     /**
      This method is called whenever the contactField ComboBox is changed. This method will filter the list of all appointments contained in the
-     database and only display the appointments associated with the selected Contact. LAMBDA: The lambda expression in this method is used to filter out
-     any Appointments that are not associated with the selectedContact.
+     database and only display the appointments associated with the selected Contact.
      @param event the event object representing the contactField ComboBox selection being changed.
-     @throws IOException the potential IOException that must be caught or declared to be thrown.
      */
-    public void contactFieldChanged(ActionEvent event) throws IOException {
+    public void contactFieldChanged(ActionEvent event) {
         Contact selectedContact = contactField.getSelectionModel().getSelectedItem();
         List<Appointment> myList = DBAppointments.getAllAppointments().stream()
                 .filter(a -> a.getContact().equals(selectedContact))
@@ -85,8 +81,7 @@ public class ContactScheduleController implements Initializable {
      @throws IOException the potential IOException that must be caught or declared to be thrown.
      */
     public void backButtonHandler(ActionEvent event) throws IOException {
-        SceneChanger sc = new SceneChanger();
-        sc.changeSceneTo(event, "/View/MainScreen.fxml");
+        SceneChanger.changeSceneTo(event, "MainScreen.fxml");
     }
 
 }

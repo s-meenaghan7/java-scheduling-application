@@ -66,21 +66,17 @@ public class AppointmentsReportController implements Initializable {
      @throws IOException the potential IOException that must be caught or declared to be thrown.
      */
     public void backButtonHandler(ActionEvent event) throws IOException {
-        SceneChanger sc = new SceneChanger();
-        sc.changeSceneTo(event, "/View/MainScreen.fxml");
+        SceneChanger.changeSceneTo(event, "MainScreen.fxml");
     }
 
     /**
      This method changes the data displayed in a text label and a table. When the month field is changed, a list of all appointments held in the database
      is filtered to only include appointments of the chosen month. In the text label, information on the total number of appointments for the month are
      displayed to the user. In the table, each unique 'type' of appointment is displayed in a column, with the number of appointments for this type
-     (for the chosen month only) is displayed in the column adjacent. LAMBDA: The first lambda is necessary to filter out any Appointments that are not
-     included in the specified month. The next lambda (map() stream method) converts each Appointment a to the integer 1. These values are then summed
-     to find the integer value representing the total number of Appointments from the totalAppointmentsList.
+     (for the chosen month only) is displayed in the column adjacent.
      @param event the event object representing the Months ComboBox selection being changed.
-     @throws IOException the potential IOException that must be caught or declared to be thrown.
      */
-    public void monthFieldChanged(ActionEvent event) throws IOException {
+    public void monthFieldChanged(ActionEvent event) {
 
         Month selectedMonth = monthField.getSelectionModel().getSelectedItem();
 
@@ -102,10 +98,6 @@ public class AppointmentsReportController implements Initializable {
      and the total number of appointments with this same type is stored in a variable total. These values are then put into the HashMap with
      keys that differentiate the two types of data (the type of appointment, and the total number of these appointments). Finally, the ObservableList of
      HashMaps is returned containing only the distinct (unique) type values in the list, to prevent duplicates from appearing in the TableView.
-     LAMBDA: The first lambda expression is used to create a HashMap for each object in the totalAppointmentsList stream. The second lambda (filter() method)
-     filters out all appointments that are not of the previously selectedType of the given Appointment object. The third lambda expression maps object that
-     was filtered through to single integer value 1, to be summed up to find the total number of Appointment objects of the same type. Finally, the fourth
-     and last lambda expression adds each HashMap row to the ObservableList of HashMaps.
      @param totalAppointmentsList the list of all appointments for a given month.
      @return ObservableList the ObservableList of HashMaps that is returned from this method, to be displayed in a TableView.
      */
@@ -126,9 +118,7 @@ public class AppointmentsReportController implements Initializable {
             row.put(TOTAL_COLUMN_MAP_KEY, String.valueOf(total));
             return row;
 
-        }).forEachOrdered(row -> {
-            mapList.add(row);
-        });
+        }).forEachOrdered(mapList::add);
 
         ObservableList<HashMap> finalReport = FXCollections.observableArrayList(mapList.stream().distinct().collect(Collectors.toList()));
 
